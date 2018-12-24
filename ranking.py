@@ -54,15 +54,15 @@ def rank_github(data: pd.DataFrame):
     return data
     
 
-def get_hist(data: pd.DataFrame, label: str):
+def get_wc(data: pd.DataFrame, col: int):
     """
-    Not used by anything anymore, was used to get the histogram for the length
-    of the open ended quesitons on the form. Left in for possible future use
+    Get the word counts of the open answer questions
     """
+    label = data.columns[col]
     answers = data[label].values
-    lens = [len(answer.split()) for answer in answers if type(answer) is str]
-    hist(lens, disp=True, xlab="NP", ylab="WC", label=label)
-
+    lens = [len(answer.split()) if type(answer) is str else 0 for answer in answers ]
+    data["WordCount{}".format(col)] = lens
+    return data
 
 def sort_data(data: pd.DataFrame):
     """
@@ -144,7 +144,9 @@ def prompt_gen(data: pd.DataFrame):
 
 def main():
     data = pd.read_csv("cu.csv")
-    data = rank_github(data)
+    data = rank_github(data) 
+    data = get_wc(data,25)
+    data = get_wc(data,26)
     data[uni_cols[0]] = [re.sub(r'\W+', '', str(string)).lower() for string in data[uni_cols[0]]]
     runloop = 1
     while runloop:
